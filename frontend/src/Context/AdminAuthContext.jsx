@@ -5,16 +5,27 @@ import { toast } from "react-toastify";
 const AdminAuthContext = createContext();
 
 export const AdminAuthProvider = ({ children }) => {
-  const [admin, setAdmin] = useState(JSON.parse(localStorage.getItem("admin")));
+
+  const [admin, setAdmin] = useState(() => {
+    const stored = localStorage.getItem("admin");
+    return stored ? JSON.parse(stored) : null;
+  });
 
   const login = async (email, password) => {
     try {
       const res = await API.post("/admin/login", { email, password });
+
       localStorage.setItem("adminToken", res.data.token);
       localStorage.setItem("admin", JSON.stringify(res.data.admin));
+
       setAdmin(res.data.admin);
+
+      toast.success(res.data.message || "Admin login successful");
+
+      return res.data.admin;
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
+      throw err;
     }
   };
 
@@ -31,4 +42,5 @@ export const AdminAuthProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdminAuth = () => useContext(AdminAuthContext);

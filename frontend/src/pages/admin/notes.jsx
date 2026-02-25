@@ -1,17 +1,30 @@
 import { useEffect, useState } from "react";
-import AdminAPI from "../../services/adminApi";
+import AdminAPI from "../../services/adminapi";
+import { toast } from "react-toastify";
 
 export default function AdminNotes() {
   const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchNotes = async () => {
-    const res = await AdminAPI.get("/notes");
-    setNotes(res.data);
+    try {
+      const res = await AdminAPI.get("/notes");
+      setNotes(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to load notes");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchNotes();
+    const loadNotes = async () => {
+      await fetchNotes();
+    };
+    loadNotes();
   }, []);
+
+  if (loading) return <p className="p-6">Loading notes...</p>;
 
   return (
     <div className="p-6">

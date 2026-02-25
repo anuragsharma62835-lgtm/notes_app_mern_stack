@@ -1,17 +1,30 @@
 import { useEffect, useState } from "react";
-import AdminAPI from "../../services/adminApi";
+import AdminAPI from "../../services/adminapi";
+import { toast } from "react-toastify";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchUsers = async () => {
-    const res = await AdminAPI.get("/users");
-    setUsers(res.data);
+    try {
+      const res = await AdminAPI.get("/users");
+      setUsers(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to load users");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchUsers();
+    const loadUsers = async () => {
+      await fetchUsers();
+    };
+    loadUsers();
   }, []);
+
+  if (loading) return <p className="p-6">Loading users...</p>;
 
   return (
     <div className="p-6">

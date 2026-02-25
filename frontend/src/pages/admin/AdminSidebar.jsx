@@ -8,7 +8,7 @@ export default function AdminSidebar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/", { replace: true });
   };
 
   const linkClass = ({ isActive }) =>

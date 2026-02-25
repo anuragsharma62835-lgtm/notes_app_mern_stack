@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../services/api";
-import { toast } from "react-toastify";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,16 +15,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await API.post("/auth/login", {
-        email,
-        password,
-      });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      toast.success(res.data.message);
-      navigate("/notes");
-    } catch (err) {
-      toast.error(err.response?.data?.message);
+      await login(email, password);
+      navigate("/notes", { replace: true });
+    } catch {
+      // Handled in auth context
     } finally {
       setLoading(false);
     }

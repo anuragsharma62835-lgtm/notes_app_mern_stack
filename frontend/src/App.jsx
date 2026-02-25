@@ -2,8 +2,9 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
+  Link,
 } from "react-router-dom";
+
 import Layout from "./Layout";
 
 import Landing from "./pages/Landing";
@@ -14,95 +15,111 @@ import Profile from "./pages/Profile";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminUsers from "./pages/admin/Users";
-import AdminNotes from "./pages/admin/Notes";
+import AdminUsers from "./pages/admin/users";
+import AdminNotes from "./pages/admin/notes";
+
+import PageNotFound from "./pages/PageNotFound";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { useAuth } from "./Context/AuthContext";
 import { useAdminAuth } from "./Context/AdminAuthContext";
 
-const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
-};
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 const AdminProtectedRoute = ({ children }) => {
   const { admin } = useAdminAuth();
-  return admin ? children : <Navigate to="/admin/login" replace />;
+  return admin ? children : <Link to="/admin/login" replace />;
 };
 
 export default function App() {
   return (
-      <Router>
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          theme="colored"
-        />
-        <Routes>
-          {/* SINGLE GLOBAL LAYOUT */}
-          <Route element={<Layout />}>
-            {/* USER ROUTES */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+    <Router>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        theme="colored"
+      />
 
-            <Route
-              path="/notes"
-              element={
-                <ProtectedRoute>
-                  <Notes />
-                </ProtectedRoute>
-              }
-            />
+      <Routes>
+        <Route element={<Layout />}>
 
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+          <Route path="/" element={<Landing />} />
 
-            {/* ADMIN */}
-            <Route path="/admin/login" element={<AdminLogin />} />
+          {/* PUBLIC ROUTES (redirect if logged in) */}
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
 
-            <Route
-              path="/admin/dashboard"
-              element={
-                <AdminProtectedRoute>
-                  <AdminDashboard />
-                </AdminProtectedRoute>
-              }
-            />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
 
-            <Route
-              path="/admin/users"
-              element={
-                <AdminProtectedRoute>
-                  <AdminUsers />
-                </AdminProtectedRoute>
-              }
-            />
+          {/* PROTECTED ROUTES */}
+          <Route
+            path="/notes"
+            element={
+              <ProtectedRoute>
+                <Notes />
+              </ProtectedRoute>
+            }
+          />
 
-            <Route
-              path="/admin/notes"
-              element={
-                <AdminProtectedRoute>
-                  <AdminNotes />
-                </AdminProtectedRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </Router>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ADMIN */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <AdminProtectedRoute>
+                <AdminUsers />
+              </AdminProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/notes"
+            element={
+              <AdminProtectedRoute>
+                <AdminNotes />
+              </AdminProtectedRoute>
+            }
+          />
+
+          {/* 404 */}
+          <Route path="*" element={<PageNotFound />} />
+
+        </Route>
+      </Routes>
+    </Router>
   );
 }

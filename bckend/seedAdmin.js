@@ -5,7 +5,7 @@ require("dotenv").config();
 const Admin = require("./model/admin");
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Mongo connected"))
+  .then(() => console.log("Mongo Atlas connected"))
   .catch(err => console.log(err));
 
 const createAdmin = async () => {

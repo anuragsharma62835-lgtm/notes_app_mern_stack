@@ -1,27 +1,48 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await API.post("/auth/register", { name, email, password });
+      setLoading(true);
+
+      await API.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      toast.success("Registration successful");
+
       navigate("/login");
     } catch (err) {
-      toast.error(err.message)
+      const message = err.response?.data?.message || "Registration failed";
+
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+      >
         <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+
         <input
           type="text"
           placeholder="Name"
@@ -30,6 +51,7 @@ export default function Register() {
           onChange={(e) => setName(e.target.value)}
           required
         />
+
         <input
           type="email"
           placeholder="Email"
@@ -38,6 +60,7 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -46,8 +69,12 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button className="w-full bg-indigo-600 text-white py-3 rounded hover:bg-indigo-700 transition">
-          Register
+
+        <button
+          disabled={loading}
+          className="w-full bg-indigo-600 text-white py-3 rounded hover:bg-indigo-700 transition disabled:opacity-50"
+        >
+          {loading ? "Registering..." : "Register"}
         </button>
       </form>
     </div>

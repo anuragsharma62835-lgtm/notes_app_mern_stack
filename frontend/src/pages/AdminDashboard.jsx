@@ -1,29 +1,46 @@
 import { useEffect, useState } from "react";
-import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../Context/AdminAuthContext";
+import AdminAPI from "../services/adminapi";
+import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
-  const { admin, logout } = useAdminAuth();
+  const navigate = useNavigate();
+  const { logout } = useAdminAuth();
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   const fetchStats = async () => {
-    const res = await API.get("/admin/stats", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
-    });
-    setStats(res.data);
+    try {
+      const res = await AdminAPI.get("/stats");
+      setStats(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchStats();
+    const loadStats = async () => {
+      await fetchStats();
+    };
+    loadStats();
   }, []);
 
-  if (!stats) return <p className="p-6">Loading...</p>;
+  if (loading) return <p className="p-6">Loading...</p>;
+  if (!stats) return <p className="p-6">No dashboard data available.</p>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-red-600">Admin Dashboard</h1>
-        <button onClick={logout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
           Logout
         </button>
       </div>

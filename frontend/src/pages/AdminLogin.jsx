@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "../Context/AdminAuthContext";
-import { toast } from "react-toastify";
 
 export default function AdminLogin() {
   const { login } = useAdminAuth();
@@ -14,8 +13,8 @@ export default function AdminLogin() {
     try {
       await login(email, password);
       navigate("/admin/dashboard");
-    } catch (err) {
-      toast.error(err.message)
+    } catch {
+      // Error toast handled in admin auth context
     }
   };
 
