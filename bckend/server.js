@@ -10,7 +10,14 @@ const adminRoutes = require("./routes/adminroutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173", // local development
+    "https://notes-app-mern-stack-mocha.vercel.app/" // production frontend
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.disable("x-powered-by");
 app.get("/api/health", (req, res) => {
