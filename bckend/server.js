@@ -14,7 +14,8 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 app.use(cors({
   origin: [
     "http://localhost:5173", // local development
-    "https://notes-app-mern-stack-mocha.vercel.app/" // production frontend
+    "https://notes-app-mern-stack-mocha.vercel.app/", // production frontend
+    "https://notes-app-mern-stack-8wc7azvhc-anurags-projects-6158872e.vercel.app/"
   ],
   credentials: true
 }));
